@@ -78,7 +78,7 @@ public class Fonction implements LevenbergMarquardt.Function
 				L=calculeL(pos,lum);
 				double[] le=addXY(L,E);
 				H=normalize(le);
-				double[] N=normalize(new int[]{pos[1],pos[0],2});//on a changé N par Nx et Ny en tant que paramètre de L-M => step2_1104_soir
+				double[] N=normalize(new double[]{nx,ny,2});//on a changé N par Nx et Ny en tant que paramètre de L-M => step2_1104_soir
 				D2=dot(L,L);
 				R=new SimpleMatrix(new double[][]{
 					{0,0,N[0]},
