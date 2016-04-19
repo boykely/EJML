@@ -1,7 +1,10 @@
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,7 +28,10 @@ public class Main
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		try
 		{
-			String dir="C:\\Users\\ralambomahay1\\Downloads\\stage\\twoshot_data_input\\book_leather_red\\";//"C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\";//
+			FileWriter writerB=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\testB.txt");
+			FileWriter writerG=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\testG.txt");
+			FileWriter writerR=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\testR.txt");
+			String dir="C:\\Users\\ralambomahay1\\Downloads\\stage\\twoshot_data_input\\book_leather_red\\";//"C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\";
 			String path="source_tile_relit_";
 			//BufferedImage[][] tiles=new BufferedImage[12][16];
 			int tileWNumber=17;
@@ -208,26 +214,30 @@ public class Main
 					paramBList.add(lm.getParameters());
 					//System.err.println(f.compte);f.compte=0;
 					blueMDataAdjusted.add(f.Y);	
+					WriteLogParameters(writerB, lm.getParameters());
 					//green								
 					lm2.optimize(paramG, posDataMatrix.get(i), Yg);
 					paramGList.add(lm2.getParameters());
 					//System.err.println(f.compte);f.compte=0;
-					greenMDataAdjusted.add(f2.Y);	
+					greenMDataAdjusted.add(f2.Y);
+					WriteLogParameters(writerG, lm2.getParameters());
 					//Red											
 					lm3.optimize(paramR, posDataMatrix.get(i), Yr);
 					paramRList.add(lm3.getParameters());
 					//System.err.println(f.compte);f.compte=0;
 					redMDataAdjusted.add(f3.Y);
-					System.out.println("pixel:"+i+" optimisé");	
+					WriteLogParameters(writerR, lm3.getParameters());
+					if(i==0 || i==10000 || i==20000 ||i==30000)System.out.println("pixel:"+i+" optimisé");	
 					//lm.getParameters().print();
 					//lm2.getParameters().print();
 					//lm3.getParameters().print();	
 				}
-			}
+			}			
 			catch(Exception ee)
 			{
 				System.err.println("Boucle optimize erreur!"+ee.getMessage());
 			}
+			writerB.close();writerG.close();writerR.close();
 			dt=new Date();
 			System.out.println("Fin de l'optimisation."+now+" à "+dt.toString());
 			System.err.println("Display:");
@@ -321,7 +331,7 @@ public class Main
 		int tempB=0;
 		try 
 		{
-			BufferedImage image=ImageIO.read(new File("C:\\Users\\ralambomahay1\\Downloads\\stage\\twoshot_data_input\\book_leather_red\\flash.png"));
+			BufferedImage image=ImageIO.read(new File("C:\\Users\\ralambomahay1\\Downloads\\stage\\twoshot_data_input\\leather_brown\\flashM.png"));
 			//BufferedImage image=ImageIO.read(new File("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\book_black_input_flash.jpg"));
 			for(int i=0;i<image.getHeight();i++)
 			{
@@ -373,5 +383,22 @@ public class Main
 		byte[] dest=((DataBufferByte)image.getRaster().getDataBuffer()).getData();
 		System.arraycopy(data, 0, dest, 0, mat.rows()*mat.cols()*mat.channels());		
 		return image;
+	}
+	public static void WriteLogParameters(FileWriter writer,DenseMatrix64F data)
+	{
+		try
+		{
+			double[] d=data.data;
+			String temp="";
+			for(int i=0;i<d.length;i++)
+			{
+				temp+=d[i]+"//";
+			}
+			writer.write(temp+"\n");
+		}
+		catch(IOException e)
+		{
+			System.err.println("Ecriture paramèretres fichiers erruers");
+		}
 	}
 }
