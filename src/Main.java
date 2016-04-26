@@ -298,7 +298,7 @@ public class Main
 				}
 			}
 			System.out.println("Debut enregistremen");
-			saveImage(image, "C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\step2.jpg");
+			saveImage(image, "C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\new_step2.jpg");
 		}
 		catch(Exception e)
 		{
