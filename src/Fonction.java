@@ -71,7 +71,7 @@ public class Fonction implements LevenbergMarquardt.Function
 			{
 				double xx=x.get(i,0);
 				pixelX=oneChannelMData.get(i, 0);//it will contain a pixel value. And it depends of the value of which channel
-				pos=decodePosition(xx);
+				pos=ChangeBase(decodePosition(xx));
 				//double[] newPos=normalize(pos);
 				//E=normalize(cam-pos)
 				E=normalize(XY(pos,cam));
@@ -167,8 +167,8 @@ public class Fonction implements LevenbergMarquardt.Function
 	}
 	public Fonction(int x,int y,Color light)
 	{
-		cam=new int[]{0,y,5};
-		lum=new int[]{x,y,10};
+		cam=ChangeBase(new int[]{x/2,y/2,1});
+		lum=ChangeBase(new int[]{x/2,y/2,1});
 		lightColor=light;
 		//cam=ChangeBase(new int[]{0,0,1});
 		//lum=ChangeBase(new int[]{0,0,1});//=> fichier optimize2 avec une lissage sur tous les tiles avant de optimisation et optimize3 sans lissage
