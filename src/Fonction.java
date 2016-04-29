@@ -167,8 +167,8 @@ public class Fonction implements LevenbergMarquardt.Function
 	}
 	public Fonction(int x,int y,Color light)
 	{
-		cam=ChangeBase(new int[]{x/2,y/2,1});
-		lum=ChangeBase(new int[]{x/2,y/2,1});
+		cam=ChangeBase(new int[]{0,y,1});
+		lum=ChangeBase(new int[]{x,y,1});
 		lightColor=light;
 		//cam=ChangeBase(new int[]{0,0,1});
 		//lum=ChangeBase(new int[]{0,0,1});//=> fichier optimize2 avec une lissage sur tous les tiles avant de optimisation et optimize3 sans lissage
