@@ -55,6 +55,9 @@ public class Fonction implements LevenbergMarquardt.Function
 		double tof=param.get(7,0);		
 		double alpha=param.get(8, 0);		
 		//contrainte paramètres
+		rod=Math.abs(rod);
+		ros=Math.abs(ros);
+		alpha=Math.abs(alpha);
 		/*
 		rod=Math.exp(rod);
 		ros=Math.exp(ros);
