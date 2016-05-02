@@ -170,8 +170,8 @@ public class Fonction implements LevenbergMarquardt.Function
 	}
 	public Fonction(int x,int y,Color light)
 	{
-		cam=ChangeBase(new int[]{0,y,1});
-		lum=ChangeBase(new int[]{x,y,1});
+		cam=new int[]{0,0,1};
+		lum=new int[]{0,0,1};
 		lightColor=light;
 		//cam=ChangeBase(new int[]{0,0,1});
 		//lum=ChangeBase(new int[]{0,0,1});//=> fichier optimize2 avec une lissage sur tous les tiles avant de optimisation et optimize3 sans lissage
@@ -182,6 +182,19 @@ public class Fonction implements LevenbergMarquardt.Function
 	{
 		p=pos;
 	}
+	//changement de base vers le répère de projection
+	public static int[] ChangeBase(int[] xyz)
+	{
+	        int[] P = new int[3];
+	        int[] u = new int[] { 1, 0, 0 };
+	        int[] v = new int[] { 0, -1, 0 };
+	        int[] w = new int[] { 0, 0, 1 };
+	        P[0] = u[0] * xyz[0]+(-3264/2) ;
+	        P[1] = v[1] * xyz[1] +(2304/2);
+	        P[2] = w[2]*xyz[2];
+	        return P;
+	 }
+	/*
 	//Changement de base vers le répère de l'image	
 	public static int[] ChangeBase(int[] xyz)
     {
@@ -193,7 +206,7 @@ public class Fonction implements LevenbergMarquardt.Function
         P[1] = v[1] * xyz[1] +(2304/2);
         P[2] = w[2]*xyz[2];
         return P;
-    }
+    }*/
 	public static int[] decodePosition(double pos)
 	{
 		int[] p=new int[3];
