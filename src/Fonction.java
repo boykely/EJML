@@ -189,8 +189,8 @@ public class Fonction implements LevenbergMarquardt.Function
 	        int[] u = new int[] { 1, 0, 0 };
 	        int[] v = new int[] { 0, -1, 0 };
 	        int[] w = new int[] { 0, 0, 1 };
-	        P[0] = u[0] * xyz[0]+(-3264/2) ;
-	        P[1] = v[1] * xyz[1] +(2304/3);
+	        P[0] = u[0] * xyz[0]+(0) ;
+	        P[1] = v[1] * xyz[1] +(2304);
 	        P[2] = w[2]*xyz[2];
 	        return P;
 	 }
