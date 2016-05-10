@@ -138,7 +138,7 @@ public class Main
 			String now=dt.toString();
 			System.out.println("Debut d'optimisation pour chaque pixel de chaque tile.. "+now);
 			//init parameters value for all optimization
-			Color av=AverageColor();
+			Color av=AverageColor(dir+"flash.png");
 			/*//Lafortune model optimization parameters
 			DenseMatrix64F paramB=new DenseMatrix64F(new double[][]{				
 				{((double)av.getBlue())/255},
@@ -322,7 +322,7 @@ public class Main
 		//variance est déjà au carré			
 		return rd.nextGaussian()*std+mu;
 	}
-	public static Color AverageColor()
+	public static Color AverageColor(String path)
 	{
 		Color c=null;
 		int temp;
@@ -331,7 +331,7 @@ public class Main
 		int tempB=0;
 		try 
 		{
-			BufferedImage image=ImageIO.read(new File("C:\\Users\\ralambomahay1\\Downloads\\stage\\twoshot_data_input\\leather_brown\\flashM.png"));
+			BufferedImage image=ImageIO.read(new File(path));
 			//BufferedImage image=ImageIO.read(new File("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\book_black_input_flash.jpg"));
 			for(int i=0;i<image.getHeight();i++)
 			{

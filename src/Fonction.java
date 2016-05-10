@@ -58,6 +58,9 @@ public class Fonction implements LevenbergMarquardt.Function
 		rod=Math.abs(rod);
 		ros=Math.abs(ros);
 		alpha=Math.abs(alpha);
+		s1=Math.abs(s1);
+		s2=Math.abs(s2);
+		s3=Math.abs(s3);
 		/*
 		rod=Math.exp(rod);
 		ros=Math.exp(ros);
@@ -104,7 +107,7 @@ public class Fonction implements LevenbergMarquardt.Function
 				//sqrt is necessary to "rough gamma" => I don't understand it but if we omit the sqrt the colors are not correct
 				//double v=((spec*ros+rod)*cosine/D2*0.5*255);//step2_1104
 				//double v=((spec*pixelX+pixelX)*cosine/D2*0.5*100);//step2_1104_x
-				double v=((spec*ros+rod)*cosine/D2*0.2*125);//on va commenter tous les paramètres mapping => step2_1104_soir
+				double v=((spec*ros+rod)*cosine/D2);//on va commenter tous les paramètres mapping => step2_1104_soir
 				v=Math.sqrt(v);
 				double value=v>256?255:v<0?0:v;
 				y.set(i, 0,value);//intensity=0.5
@@ -187,9 +190,9 @@ public class Fonction implements LevenbergMarquardt.Function
 	{
 	        int[] P = new int[3];
 	        int[] u = new int[] { 1, 0, 0 };
-	        int[] v = new int[] { 0, -1, 0 };
+	        int[] v = new int[] { 0, 1, 0 };
 	        int[] w = new int[] { 0, 0, 1 };
-	        P[0] = u[0] * xyz[0]+(0) ;
+	        P[0] = u[0] * xyz[0]+(3264/2) ;
 	        P[1] = v[1] * xyz[1] +(2304/2);
 	        P[2] = w[2]*xyz[2];
 	        return P;
