@@ -77,14 +77,14 @@ public class Fonction implements LevenbergMarquardt.Function
 			{
 				double xx=x.get(i,0);
 				pixelX=oneChannelMData.get(i, 0);//it will contain a pixel value. And it depends of the value of which channel
-				pos=ChangeBase(decodePosition(xx));
+				pos=decodePosition(xx);
 				//double[] newPos=normalize(pos);
 				//E=normalize(cam-pos)
 				E=normalize(XY(pos,cam));
 				L=calculeL(pos,lum);
 				double[] le=addXY(L,E);
 				H=normalize(le);
-				double[] N=normalize(new double[]{nx,ny,2});//on a changé N par Nx et Ny en tant que paramètre de L-M => step2_1104_soir
+				double[] N=normalize(ChangeBase(new double[]{nx,ny,2}));//on a changé N par Nx et Ny en tant que paramètre de L-M => step2_1104_soir
 				D2=dot(L,L);
 				R=new SimpleMatrix(new double[][]{
 					{0,0,N[0]},
@@ -173,11 +173,11 @@ public class Fonction implements LevenbergMarquardt.Function
 	}
 	public Fonction(int x,int y,Color light)
 	{
-		cam=new int[]{0,0,1};
-		lum=new int[]{0,0,1};
+		//cam=new int[]{0,0,1};
+		//lum=new int[]{0,0,1};
 		lightColor=light;
-		//cam=ChangeBase(new int[]{0,0,1});
-		//lum=ChangeBase(new int[]{0,0,1});//=> fichier optimize2 avec une lissage sur tous les tiles avant de optimisation et optimize3 sans lissage
+		cam=ChangeBase(new int[]{0,0,1});
+		lum=ChangeBase(new int[]{0,0,1});//=> fichier optimize2 avec une lissage sur tous les tiles avant de optimisation et optimize3 sans lissage
 		//lum=ChangeBase(new int[]{100,-50,1});//=> fichier optimize0
 		//lum=new int[]{3000,500,1}; //=> fichier optimize1 + optimize8
 	}
@@ -185,7 +185,6 @@ public class Fonction implements LevenbergMarquardt.Function
 	{
 		p=pos;
 	}
-	//changement de base vers le répère de projection
 	public static int[] ChangeBase(int[] xyz)
 	{
 	        int[] P = new int[3];
@@ -197,19 +196,18 @@ public class Fonction implements LevenbergMarquardt.Function
 	        P[2] = w[2]*xyz[2];
 	        return P;
 	 }
-	/*
-	//Changement de base vers le répère de l'image	
-	public static int[] ChangeBase(int[] xyz)
-    {
-        int[] P = new int[3];
-        int[] u = new int[] { 1, 0, 0 };
-        int[] v = new int[] { 0, 1, 0 };
-        int[] w = new int[] { 0, 0, 1 };
+	public static double[] ChangeBase(double[] xyz)
+	{
+		double[] P = new double[3];
+		double[] u = new double[] { 1, 0, 0 };
+		double[] v = new double[] { 0, 1, 0 };
+		double[] w = new double[] { 0, 0, 1 };
         P[0] = u[0] * xyz[0]+(3264/2) ;
         P[1] = v[1] * xyz[1] +(2304/2);
         P[2] = w[2]*xyz[2];
         return P;
-    }*/
+	}
+	
 	public static int[] decodePosition(double pos)
 	{
 		int[] p=new int[3];
