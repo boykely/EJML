@@ -94,8 +94,8 @@ public class Fonction implements LevenbergMarquardt.Function
 				Hn=normalize(calculeHn(H,N,R));	
 				Hnp=normalize(div(Hn,Hn[2]));
 				M=new SimpleMatrix(new double[][]{
-					{lightColor.getRed(),lightColor.getBlue()},
-					{lightColor.getBlue(),lightColor.getGreen()},
+					{s1,s3},
+					{s3,s2},
 				});
 				
 				HnpW=normalize(calculeHnpW(M,Hnp[0],Hnp[1]));

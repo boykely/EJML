@@ -193,6 +193,8 @@ public class Main
 			});
 			try
 			{
+				DenseMatrix64F[] temp=new DenseMatrix64F[3];
+				DenseMatrix64F[] Y=new DenseMatrix64F[3];
 				for(int i=0;i<36864;i++)
 				{
 					//il faut optimiser chaque pixel
@@ -213,24 +215,39 @@ public class Main
 					lm.optimize(paramB, posDataMatrix.get(i), Yb);
 					paramBList.add(lm.getParameters());
 					//System.err.println(f.compte);f.compte=0;
-					blueMDataAdjusted.add(f.Y);	
-					WriteLogParameters(writerB, lm.getParameters());
 					//green								
 					lm2.optimize(paramG, posDataMatrix.get(i), Yg);
 					paramGList.add(lm2.getParameters());
 					//System.err.println(f.compte);f.compte=0;
-					greenMDataAdjusted.add(f2.Y);
-					WriteLogParameters(writerG, lm2.getParameters());
 					//Red											
 					lm3.optimize(paramR, posDataMatrix.get(i), Yr);
 					paramRList.add(lm3.getParameters());
 					//System.err.println(f.compte);f.compte=0;
-					redMDataAdjusted.add(f3.Y);
-					WriteLogParameters(writerR, lm3.getParameters());
 					if(i==0 || i==10000 || i==20000 ||i==30000)System.out.println("pixel:"+i+" optimisé");	
 					//lm.getParameters().print();
 					//lm2.getParameters().print();
-					//lm3.getParameters().print();	
+					//lm3.getParameters().print();
+					if(!Double.isNaN(lm.getParameters().get(0)))
+					{
+						temp[0]=new DenseMatrix64F(lm.getParameters());
+						Y[0]=new DenseMatrix64F(f.Y);
+					}
+					if(!Double.isNaN(lm2.getParameters().get(0)))
+					{
+						temp[1]=new DenseMatrix64F(lm2.getParameters());
+						Y[1]=new DenseMatrix64F(f2.Y);
+					}
+					if(!Double.isNaN(lm3.getParameters().get(0)))
+					{
+						temp[2]=new DenseMatrix64F(lm3.getParameters());
+						Y[2]=new DenseMatrix64F(f3.Y);
+					}
+					WriteLogParameters(writerB, temp[0]);
+					WriteLogParameters(writerG, temp[1]);
+					WriteLogParameters(writerR, temp[2]);
+					blueMDataAdjusted.add(Y[0]);
+					greenMDataAdjusted.add(Y[1]);
+					redMDataAdjusted.add(Y[2]);
 				}
 			}			
 			catch(Exception ee)
