@@ -9,6 +9,7 @@ import org.ejml.simple.SimpleMatrix;
 public class Fonction implements LevenbergMarquardt.Function 
 {	
 	private Color lightColor;
+	private int currentColor;
 	public DenseMatrix64F oneChannelMData;	
 	public int compte=0;
 	public DenseMatrix64F Y;
@@ -53,7 +54,8 @@ public class Fonction implements LevenbergMarquardt.Function
 		double ny=param.get(6,0);
 		double nz=1;		
 		double tof=param.get(7,0);		
-		double alpha=param.get(8, 0);		
+		double alpha=param.get(8, 0);	
+		double m=0.2;
 		//contrainte paramètres
 		rod=Math.abs(rod);
 		ros=Math.abs(ros);
@@ -82,86 +84,18 @@ public class Fonction implements LevenbergMarquardt.Function
 				//E=normalize(cam-pos)
 				E=normalize(XY(pos,cam));
 				L=calculeL(pos,lum);
+				D2=dot(E,E);
 				double[] le=addXY(L,E);
 				H=normalize(le);
 				double[] N=normalize(ChangeBase(new double[]{nx,ny,2}));//on a changé N par Nx et Ny en tant que paramètre de L-M => step2_1104_soir
-				D2=dot(L,L);
-				R=new SimpleMatrix(new double[][]{
-					{0,0,N[0]},
-					{0,0,N[1]},
-					{-N[0],-N[1],0}
-				});
-				Hn=normalize(calculeHn(H,N,R));	
-				Hnp=normalize(div(Hn,Hn[2]));
-				M=new SimpleMatrix(new double[][]{
-					{s1,s3},
-					{s3,s2},
-				});
-				
-				HnpW=normalize(calculeHnpW(M,Hnp[0],Hnp[1]));
-				double spec=Math.exp(-Math.pow(dot(new double[]{HnpW[0],HnpW[1]},new double[]{Hnp[0],Hnp[1]}), alpha*0.5));
-				double cosine=Math.max(0, dot(N,L));
-				double F0=0.04;
-				double fres=F0+(1-F0)*Math.pow(1.0-Math.max(0, dot(H,E)), 5.0);
-				spec=spec*fres/F0;
+				double angle=dot(N,H)/m;
+				double spec=tof*Math.exp(-(angle*angle));
+				double cosine=Math.max(0, dot(N,E));
 				//sqrt is necessary to "rough gamma" => I don't understand it but if we omit the sqrt the colors are not correct
-				//double v=((spec*ros+rod)*cosine/D2*0.5*255);//step2_1104
-				//double v=((spec*pixelX+pixelX)*cosine/D2*0.5*100);//step2_1104_x
-				double v=((spec*ros+rod)*cosine/D2);//on va commenter tous les paramètres mapping => step2_1104_soir
+				double v=(((spec*ros)+(rod))*cosine/D2);//on va commenter tous les paramètres mapping => step2_1104_soir
 				v=Math.sqrt(v);
 				double value=v>256?255:v<0?0:v;
 				y.set(i, 0,value);//intensity=0.5
-				/*
-				//modele BRDF A
-				//E=normalize(cam-pos) => EP
-				E=normalize(XY(pos,cam));				
-				L=calculeL(pos,lum);
-				double[] le=addXY(L,E);
-				H=normalize(le);
-				//N=normalize(new int[]{pos[1],pos[0],2});
-				D2=dot(L,L);
-				R=new SimpleMatrix(new double[][]{
-					{0,0,N[0]},
-					{0,0,N[1]},
-					{-N[0],-N[1],0}
-				});
-				Hn=calculeHn(H,N,R);// Halfway vector in normal-oriented coordinates (so normal is [0,0,1])
-				Hnp=div(Hn,Hn[2]);//h=hxy/hz
-				S=new SimpleMatrix(new double[][]{
-					{s1,s3},
-					{s3,s2},
-				});
-				HnpW=calculeHnpW(S,Hnp[0],Hnp[1]);
-				double spec=Math.exp(-Math.pow(dot(new double[]{HnpW[0],HnpW[1]},new double[]{Hnp[0],Hnp[1]}), (int)Math.round(alpha*0.5)));//D(h)
-				if(Double.isInfinite(spec) ||Double.isNaN(spec))spec=1;
-				double vp=v_p(newPos, tof);if(Double.isInfinite(vp) || Double.isNaN(vp))vp=1;
-				double IP=1/(E[0]*E[0]+E[1]*E[1]+E[2]*E[2]);if(Double.isInfinite(IP) || Double.isNaN(IP))IP=1;
-				double CP=Math.max(0, dot(N,E));
-				double somme=vp*IP*CP;
-				if(somme<0)somme*=-1;
-				double value=somme*(Math.abs(rod+ros*spec*pixelX));if(Double.isInfinite(value) || Double.isNaN(value))value=pixelX;
-				y.set(i, 0,value);
-				//double cosine=Math.max(0, dot(N,L));
-				//double F0=0.04;
-				//double fres=F0+(1-F0)*Math.pow(1.0-Math.max(0, dot(H,E)), 5.0);
-				//double fres=F0+(1-F0)*Math.pow(1.0-Math.max(0, dot(H,E)), fresnel_pow);
-				//spec=spec*fres/F0;
-				//sqrt is necessary to "rough gamma" => I don't understand it but if we omit the sqrt the colors are not correct
-				//y.set(i, 0,Math.sqrt(((spec*pixelX+pixelX)*cosine/D2*intensity*255)));//fichier step2_0704
-				//y.set(i, 0,Math.sqrt(((spec*lightColor+lightColor)*cosine/D2*intensity*255)));//fichier step2_0804 last test
-				*/
-				//
-				/*
-				//modele Lafortune => on va travailler sur le répère de l'image
-				P=decodePosition(xx);
-				//P=ChangeBase(p);
-				EP=vectXY(cam, P);
-				EPn=normalize(EP);				
-				LP=vectXY(lum,P);
-				LPn=normalize(LP);				
-				lobe=Cxi*(EPn[0]*LPn[0]+EPn[1]*EPn[1])+Czi*(EPn[2]*LPn[2]);
-				value=rod*lightColor+Math.pow(lobe<0?0:lobe, N)*100;				
-				y.set(i,0,value);*/
 			}
 		}
 		catch(Exception e)
@@ -171,15 +105,12 @@ public class Fonction implements LevenbergMarquardt.Function
 		
 		Y=y;		
 	}
-	public Fonction(int x,int y,Color light)
+	public Fonction(int x,int y,Color light,int c)
 	{
-		//cam=new int[]{0,0,1};
-		//lum=new int[]{0,0,1};
 		lightColor=light;
+		currentColor=c;
 		cam=ChangeBase(new int[]{0,0,1});
 		lum=ChangeBase(new int[]{0,0,1});//=> fichier optimize2 avec une lissage sur tous les tiles avant de optimisation et optimize3 sans lissage
-		//lum=ChangeBase(new int[]{100,-50,1});//=> fichier optimize0
-		//lum=new int[]{3000,500,1}; //=> fichier optimize1 + optimize8
 	}
 	public void getPositionList(HashMap<Integer,int[]>pos)
 	{
@@ -191,8 +122,8 @@ public class Fonction implements LevenbergMarquardt.Function
 	        int[] u = new int[] { 1, 0, 0 };
 	        int[] v = new int[] { 0, 1, 0 };
 	        int[] w = new int[] { 0, 0, 1 };
-	        P[0] = u[0] * xyz[0]+(3264/2) ;
-	        P[1] = v[1] * xyz[1] +(2304/2);
+	        P[0] = u[0] * xyz[0]+(2304/2) ;
+	        P[1] = v[1] * xyz[1] +(3264/2);
 	        P[2] = w[2]*xyz[2];
 	        return P;
 	 }
@@ -202,8 +133,8 @@ public class Fonction implements LevenbergMarquardt.Function
 		double[] u = new double[] { 1, 0, 0 };
 		double[] v = new double[] { 0, 1, 0 };
 		double[] w = new double[] { 0, 0, 1 };
-        P[0] = u[0] * xyz[0]+(3264/2) ;
-        P[1] = v[1] * xyz[1] +(2304/2);
+		P[0] = u[0] * xyz[0]+(2304/2) ;
+	    P[1] = v[1] * xyz[1] +(3264/2);
         P[2] = w[2]*xyz[2];
         return P;
 	}

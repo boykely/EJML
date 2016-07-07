@@ -28,11 +28,11 @@ public class Main
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		try
 		{
-			FileWriter writerB=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\testB.txt");
-			FileWriter writerG=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\testG.txt");
-			FileWriter writerR=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\testR.txt");
-			String dir="C:\\Users\\ralambomahay1\\Downloads\\stage\\twoshot_data_input\\book_leather_red\\";//"C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\";
-			String path="source_tile_relit_";
+			FileWriter writerB=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\source_tile\\testB.txt");
+			FileWriter writerG=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\source_tile\\testG.txt");
+			FileWriter writerR=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\source_tile\\testR.txt");
+			String dir="C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\source_tile\\";//"C:\\Users\\ralambomahay1\\Downloads\\stage\\twoshot_data_input\\book_leather_red\\";//"C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\";
+			String path="source_tile_";
 			//BufferedImage[][] tiles=new BufferedImage[12][16];
 			int tileWNumber=17;
 			int tileHNumber=12;
@@ -62,7 +62,7 @@ public class Main
 			List<DenseMatrix64F> greenMDataAdjusted=new ArrayList<>();
 			List<DenseMatrix64F> redMDataAdjusted=new ArrayList<>();
 			
-			System.out.println("start intialisation des données...");
+			System.out.println("start intialisation des donnÃƒÂ©es...");
 			Mat tempMat;
 			BufferedImage tempBuffer;
 			for(int fileI=0;fileI<tileHNumber;fileI++)
@@ -132,13 +132,13 @@ public class Main
 			
 			
 			//
-			System.out.println("fin initialisation des données.");
+			System.out.println("fin initialisation des donnÃ©es.");
 			//System.out.println(posData.length+"/"+greenMData.size()+"/"+redMData.size());
 			Date dt=new Date();
 			String now=dt.toString();
 			System.out.println("Debut d'optimisation pour chaque pixel de chaque tile.. "+now);
 			//init parameters value for all optimization
-			Color av=AverageColor(dir+"flash.png");
+			Color av=AverageColor(dir+"flash.jpg");
 			/*//Lafortune model optimization parameters
 			DenseMatrix64F paramB=new DenseMatrix64F(new double[][]{				
 				{((double)av.getBlue())/255},
@@ -166,7 +166,7 @@ public class Main
 				{0},//s3
 				{10},//nx
 				{10},//ny => nz = 1 
-				{-1},//tof
+				{1},//tof
 				{0.4},//alpha				
 			});
 			DenseMatrix64F paramG=new DenseMatrix64F(new double[][]{
@@ -177,7 +177,7 @@ public class Main
 				{0},//s3
 				{10},//nx
 				{10},//ny => nz = 1 
-				{-1},//tof
+				{1},//tof
 				{0.4},//alpha	
 			});
 			DenseMatrix64F paramR=new DenseMatrix64F(new double[][]{
@@ -188,7 +188,7 @@ public class Main
 				{0},//s3
 				{10},//nx
 				{10},//ny => nz = 1 
-				{-1},//tof
+				{1},//tof
 				{0.4},//alpha	
 			});
 			try
@@ -198,9 +198,9 @@ public class Main
 				for(int i=0;i<36864;i++)
 				{
 					//il faut optimiser chaque pixel
-					Fonction f=new Fonction(17*192,12*192,av);
-					Fonction f2=new Fonction(17*192,12*192,av);
-					Fonction f3=new Fonction(17*192,12*192,av);
+					Fonction f=new Fonction(17*192,12*192,av,av.getBlue());
+					Fonction f2=new Fonction(17*192,12*192,av,av.getGreen());
+					Fonction f3=new Fonction(17*192,12*192,av,av.getRed());
 					f.oneChannelMData=blueMData.get(i);//f.lightColor=0;//optimize10 file
 					f2.oneChannelMData=greenMData.get(i);//f2.lightColor=255;
 					f3.oneChannelMData=redMData.get(i);//f3.lightColor=0;
@@ -215,39 +215,24 @@ public class Main
 					lm.optimize(paramB, posDataMatrix.get(i), Yb);
 					paramBList.add(lm.getParameters());
 					//System.err.println(f.compte);f.compte=0;
+					blueMDataAdjusted.add(f.Y);	
+					WriteLogParameters(writerB, lm.getParameters());
 					//green								
 					lm2.optimize(paramG, posDataMatrix.get(i), Yg);
 					paramGList.add(lm2.getParameters());
 					//System.err.println(f.compte);f.compte=0;
+					greenMDataAdjusted.add(f2.Y);
+					WriteLogParameters(writerG, lm2.getParameters());
 					//Red											
 					lm3.optimize(paramR, posDataMatrix.get(i), Yr);
 					paramRList.add(lm3.getParameters());
 					//System.err.println(f.compte);f.compte=0;
-					if(i==0 || i==10000 || i==20000 ||i==30000)System.out.println("pixel:"+i+" optimisé");	
+					redMDataAdjusted.add(f3.Y);
+					WriteLogParameters(writerR, lm3.getParameters());
+					if(i==0 || i==10000 || i==20000 ||i==30000)System.out.println("pixel:"+i+" optimisÃƒÂ©");	
 					//lm.getParameters().print();
 					//lm2.getParameters().print();
-					//lm3.getParameters().print();
-					if(!Double.isNaN(lm.getParameters().get(0)))
-					{
-						temp[0]=new DenseMatrix64F(lm.getParameters());
-						Y[0]=new DenseMatrix64F(f.Y);
-					}
-					if(!Double.isNaN(lm2.getParameters().get(0)))
-					{
-						temp[1]=new DenseMatrix64F(lm2.getParameters());
-						Y[1]=new DenseMatrix64F(f2.Y);
-					}
-					if(!Double.isNaN(lm3.getParameters().get(0)))
-					{
-						temp[2]=new DenseMatrix64F(lm3.getParameters());
-						Y[2]=new DenseMatrix64F(f3.Y);
-					}
-					WriteLogParameters(writerB, temp[0]);
-					WriteLogParameters(writerG, temp[1]);
-					WriteLogParameters(writerR, temp[2]);
-					blueMDataAdjusted.add(Y[0]);
-					greenMDataAdjusted.add(Y[1]);
-					redMDataAdjusted.add(Y[2]);
+					//lm3.getParameters().print();	
 				}
 			}			
 			catch(Exception ee)
@@ -256,7 +241,7 @@ public class Main
 			}
 			writerB.close();writerG.close();writerR.close();
 			dt=new Date();
-			System.out.println("Fin de l'optimisation."+now+" à "+dt.toString());
+			System.out.println("Fin de l'optimisation."+now+" Ã Â  "+dt.toString());
 			System.err.println("Display:");
 			//for(int i=0;i<192;i++)System.out.println(blueMData.get(0).get(i, 0)+" -- "+blueMDataAdjusted.get(0).get(i)+"/"+greenMData.get(0).get(i, 0)+" -- "+greenMDataAdjusted.get(0).get(i)+"/"+redMData.get(0).get(i, 0)+" -- "+redMDataAdjusted.get(0).get(i));
 			
@@ -315,7 +300,7 @@ public class Main
 				}
 			}
 			System.out.println("Debut enregistremen");
-			saveImage(image, "C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\new_step2.jpg");
+			saveImage(image, "C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\source_tile\\new_step2.jpg");
 		}
 		catch(Exception e)
 		{
@@ -336,7 +321,7 @@ public class Main
 	}
 	public static double Gaussian(Random rd,double mu,double std)
 	{
-		//variance est déjà au carré			
+		//variance est dÃƒÂ©jÃƒÂ  au carrÃƒÂ©			
 		return rd.nextGaussian()*std+mu;
 	}
 	public static Color AverageColor(String path)
@@ -415,7 +400,7 @@ public class Main
 		}
 		catch(IOException e)
 		{
-			System.err.println("Ecriture paramèretres fichiers erruers");
+			System.err.println("Ecriture paramÃƒÂ¨retres fichiers erruers");
 		}
 	}
 }
