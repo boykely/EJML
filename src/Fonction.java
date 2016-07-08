@@ -55,7 +55,7 @@ public class Fonction implements LevenbergMarquardt.Function
 		double nz=1;		
 		double tof=param.get(7,0);		
 		double alpha=param.get(8, 0);	
-		double m=0.2;
+		double m=0.3;
 		//contrainte paramètres
 		rod=Math.abs(rod);
 		ros=Math.abs(ros);
@@ -88,8 +88,8 @@ public class Fonction implements LevenbergMarquardt.Function
 				double[] le=addXY(L,E);
 				H=normalize(le);
 				double[] N=normalize(ChangeBase(new double[]{nx,ny,2}));//on a changé N par Nx et Ny en tant que paramètre de L-M => step2_1104_soir
-				double angle=Math.acos(dot(N,H))/m;
-				double spec=tof*Math.exp(-(angle*angle));
+				double angle=Math.acos(Math.max(0,dot(N,H)))/m;
+				double spec=1*Math.exp(-(angle*angle));
 				double cosine=Math.max(0, dot(N,E));
 				//sqrt is necessary to "rough gamma" => I don't understand it but if we omit the sqrt the colors are not correct
 				double v=(((spec*ros)+(rod))*cosine/D2);//on va commenter tous les paramètres mapping => step2_1104_soir
@@ -122,8 +122,8 @@ public class Fonction implements LevenbergMarquardt.Function
 	        int[] u = new int[] { 1, 0, 0 };
 	        int[] v = new int[] { 0, 1, 0 };
 	        int[] w = new int[] { 0, 0, 1 };
-	        P[0] = u[0] * xyz[0]+(3263) ;
-	        P[1] = v[1] * xyz[1] +(0);
+	        P[0] = u[0] * xyz[0]+(2304/2) ;
+	        P[1] = v[1] * xyz[1] +(3264/2);
 	        P[2] = w[2]*xyz[2];
 	        return P;
 	 }
@@ -133,8 +133,8 @@ public class Fonction implements LevenbergMarquardt.Function
 		double[] u = new double[] { 1, 0, 0 };
 		double[] v = new double[] { 0, 1, 0 };
 		double[] w = new double[] { 0, 0, 1 };
-		P[0] = u[0] * xyz[0]+(3263) ;
-	    P[1] = v[1] * xyz[1] +(0);
+		P[0] = u[0] * xyz[0]+(2304/2) ;
+        P[1] = v[1] * xyz[1] +(3264/2);
         P[2] = w[2]*xyz[2];
         return P;
 	}
