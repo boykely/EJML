@@ -94,7 +94,7 @@ public class Fonction implements LevenbergMarquardt.Function
 				//sqrt is necessary to "rough gamma" => I don't understand it but if we omit the sqrt the colors are not correct
 				double v=(((spec*ros)+(rod))*cosine/D2);//on va commenter tous les paramètres mapping => step2_1104_soir
 				v=Math.sqrt(v);
-				double value=v>256?255:v<0?0:v;
+				double value=v>256?255:v<=0?pixelX:v;
 				y.set(i, 0,value);//intensity=0.5
 			}
 		}
