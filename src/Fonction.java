@@ -55,11 +55,11 @@ public class Fonction implements LevenbergMarquardt.Function
 		double nz=1;		
 		double tof=param.get(7,0);		
 		double alpha=param.get(8, 0);	
-		double m=0.3;
+		//double m=0.3;
 		//contrainte paramètres
 		rod=Math.abs(rod);
 		ros=Math.abs(ros);
-		alpha=Math.abs(alpha);
+		double m=Math.abs(alpha);
 		s1=Math.abs(s1);
 		s2=Math.abs(s2);
 		s3=Math.abs(s3);
@@ -93,7 +93,7 @@ public class Fonction implements LevenbergMarquardt.Function
 				double cosine=Math.max(0, dot(N,E));
 				//sqrt is necessary to "rough gamma" => I don't understand it but if we omit the sqrt the colors are not correct
 				//double v=(((spec*ros)+(rod))*cosine/D2);//on va commenter tous les paramètres mapping => step2_1104_soir
-				double v=(((spec*ros)+(rod)));//on va commenter tous les paramètres mapping => step2_1104_soir
+				double v=(((spec*ros)+(rod))/D2);//on va commenter tous les paramètres mapping => step2_1104_soir
 				v=Math.sqrt(v);
 				double value=v>256?255:v<0?0:v;
 				y.set(i, 0,value);//intensity=0.5

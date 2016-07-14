@@ -160,18 +160,18 @@ public class Main
 			});*/
 			DenseMatrix64F paramB=new DenseMatrix64F(new double[][]{
 				{av.getBlue()},//rod
-				{-1},//ros
+				{1},//ros
 				{-3},//s1
 				{-3},//s2
 				{0},//s3
-				{10},//nx
-				{10},//ny => nz = 1 
+				{1},//nx
+				{1},//ny => nz = 1 
 				{1},//tof
 				{0.4},//alpha				
 			});
 			DenseMatrix64F paramG=new DenseMatrix64F(new double[][]{
 				{av.getGreen()},//rod
-				{0},//ros
+				{1},//ros
 				{-3},//s1
 				{-3},//s2
 				{0},//s3
@@ -182,14 +182,14 @@ public class Main
 			});
 			DenseMatrix64F paramR=new DenseMatrix64F(new double[][]{
 				{av.getBlue()},//rod
-				{0},//ros
+				{1},//ros
 				{-3},//s1
 				{-3},//s2
 				{0},//s3
-				{10},//nx
-				{10},//ny => nz = 1 
+				{1},//nx
+				{1},//ny => nz = 1 
 				{1},//tof
-				{0.4},//alpha	
+				{0},//alpha	
 			});
 			try
 			{
