@@ -88,7 +88,7 @@ public class Fonction implements LevenbergMarquardt.Function
 				double[] le=addXY(L,E);
 				H=normalize(le);
 				double[] N=normalize(ChangeBase(new double[]{nx,ny,2}));//on a changé N par Nx et Ny en tant que paramètre de L-M => step2_1104_soir
-				double angle=Math.acos(dot(N,H))/m;
+				double angle=Math.acos(Math.max(0, dot(N,H)))/m;
 				double spec=1*Math.exp(-(angle*angle));
 				double cosine=Math.max(0, dot(N,E));
 				//sqrt is necessary to "rough gamma" => I don't understand it but if we omit the sqrt the colors are not correct
