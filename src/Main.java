@@ -28,10 +28,10 @@ public class Main
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		try
 		{
-			FileWriter writerB=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\source_tile\\testB.txt");
-			FileWriter writerG=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\source_tile\\testG.txt");
-			FileWriter writerR=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\source_tile\\testR.txt");
-			String dir="C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\source_tile\\";//"C:\\Users\\ralambomahay1\\Downloads\\stage\\twoshot_data_input\\book_leather_red\\";//"C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\";
+			FileWriter writerB=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\testB.txt");
+			FileWriter writerG=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\testG.txt");
+			FileWriter writerR=new FileWriter("C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\testR.txt");
+			String dir="C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\";//"C:\\Users\\ralambomahay1\\Downloads\\stage\\twoshot_data_input\\book_leather_red\\";//"C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\";
 			String path="source_tile_";
 			//BufferedImage[][] tiles=new BufferedImage[12][16];
 			int tileWNumber=17;
@@ -51,6 +51,7 @@ public class Main
 			List<DenseMatrix64F> paramBList=new ArrayList<>();//it contains all parameters for each pixel
 			List<DenseMatrix64F> paramGList=new ArrayList<>();//it contains all parameters for each pixel
 			List<DenseMatrix64F> paramRList=new ArrayList<>();//it contains all parameters for each pixel
+			List<int[]> constantLight=new ArrayList<>();//we assume that the light direction is constant for a brdf slice estimation (in my opinion)
 			
 			int colonne=192;
 			int ligne=192;
@@ -68,9 +69,8 @@ public class Main
 			for(int fileI=0;fileI<tileHNumber;fileI++)
 			{							
 				for(int fileJ=0;fileJ<tileWNumber;fileJ++)
-				{									
-					tempBuffer=ImageIO.read(new File(dir+path+fileI+"_"+fileJ+".jpg"));
-					
+				{		
+					tempBuffer=ImageIO.read(new File(dir+path+fileI+"_"+fileJ+".jpg"));					
 					//on va lisser chaque tiles avant d'appliquer le svbrdf optimisation
 					tempMat=convertTileToCV(tempBuffer);
 					Imgproc.GaussianBlur(tempMat, tempMat, new Size(3,3), 1);
@@ -110,6 +110,9 @@ public class Main
 							iter++;			
 						}
 					}
+					constantLight.add(new int[]{
+						i,j
+					});
 					posData[pI]=temp;
 					tempPos.data=temp;
 					posDataMatrix.add(tempPos);
@@ -129,7 +132,6 @@ public class Main
 			//System.err.println(kk[1].substring(0, kk[1].length()-1));
 			//for(int i=0;i<192;i++)System.err.println(posDataMatrix.get(0).get(i)+" -- "+posData[0][i]);
 			//for(int i=0;i<192;i++)System.out.println(blueMData.get(0).get(i, 0)+" -- "+greenMData.get(0).get(i, 0)+" -- "+redMData.get(0).get(i, 0));
-			
 			
 			//
 			System.out.println("fin initialisation des données.");
@@ -160,36 +162,36 @@ public class Main
 			});*/
 			DenseMatrix64F paramB=new DenseMatrix64F(new double[][]{
 				{av.getBlue()},//rod
-				{1},//ros
-				{-3},//s1
-				{-3},//s2
-				{0},//s3
-				{1},//nx
-				{1},//ny => nz = 1 
-				{1},//tof
-				{0.4},//alpha				
-			});
-			DenseMatrix64F paramG=new DenseMatrix64F(new double[][]{
-				{av.getGreen()},//rod
-				{1},//ros
+				{-1},//ros
 				{-3},//s1
 				{-3},//s2
 				{0},//s3
 				{10},//nx
 				{10},//ny => nz = 1 
-				{1},//tof
+				{-1},//tof
+				{0.4},//alpha				
+			});
+			DenseMatrix64F paramG=new DenseMatrix64F(new double[][]{
+				{av.getGreen()},//rod
+				{0},//ros
+				{-3},//s1
+				{-3},//s2
+				{0},//s3
+				{10},//nx
+				{10},//ny => nz = 1 
+				{-1},//tof
 				{0.4},//alpha	
 			});
 			DenseMatrix64F paramR=new DenseMatrix64F(new double[][]{
 				{av.getBlue()},//rod
-				{1},//ros
+				{0},//ros
 				{-3},//s1
 				{-3},//s2
 				{0},//s3
-				{1},//nx
-				{1},//ny => nz = 1 
-				{1},//tof
-				{0},//alpha	
+				{10},//nx
+				{10},//ny => nz = 1 
+				{-1},//tof
+				{0.4},//alpha	
 			});
 			try
 			{
@@ -204,6 +206,9 @@ public class Main
 					f.oneChannelMData=blueMData.get(i);//f.lightColor=0;//optimize10 file
 					f2.oneChannelMData=greenMData.get(i);//f2.lightColor=255;
 					f3.oneChannelMData=redMData.get(i);//f3.lightColor=0;
+					f.constantPos=constantLight.get(i);
+					f2.constantPos=constantLight.get(i);
+					f3.constantPos=constantLight.get(i);
 					LevenbergMarquardt lm=new LevenbergMarquardt(f);
 					LevenbergMarquardt lm2=new LevenbergMarquardt(f2);
 					LevenbergMarquardt lm3=new LevenbergMarquardt(f3);
@@ -296,11 +301,11 @@ public class Main
 					g=g>256?255:g;					
 					b=b>256?255:b;*/
 					color=new Color(r,g,b);					
-					image.setRGB(position[1],position[0], color.getRGB());
+					image.setRGB(position[0],position[1], color.getRGB());
 				}
 			}
 			System.out.println("Debut enregistremen");
-			saveImage(image, "C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\source_tile\\new_step2.jpg");
+			saveImage(image, "C:\\Users\\ralambomahay1\\Downloads\\Java_workspace\\newGit\\Data\\SampleTransportReflectance\\Final\\new_step2.jpg");
 		}
 		catch(Exception e)
 		{
