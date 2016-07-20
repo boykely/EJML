@@ -133,6 +133,7 @@ public class Main
 			//for(int i=0;i<192;i++)System.err.println(posDataMatrix.get(0).get(i)+" -- "+posData[0][i]);
 			//for(int i=0;i<192;i++)System.out.println(blueMData.get(0).get(i, 0)+" -- "+greenMData.get(0).get(i, 0)+" -- "+redMData.get(0).get(i, 0));
 			
+			
 			//
 			System.out.println("fin initialisation des données.");
 			//System.out.println(posData.length+"/"+greenMData.size()+"/"+redMData.size());
@@ -301,7 +302,7 @@ public class Main
 					g=g>256?255:g;					
 					b=b>256?255:b;*/
 					color=new Color(r,g,b);					
-					image.setRGB(position[0],position[1], color.getRGB());
+					image.setRGB(position[1],position[0], color.getRGB());
 				}
 			}
 			System.out.println("Debut enregistremen");

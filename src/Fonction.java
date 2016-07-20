@@ -80,8 +80,8 @@ public class Fonction implements LevenbergMarquardt.Function
 			{
 				double xx=x.get(i,0);
 				pixelX=oneChannelMData.get(i, 0);//it will contain a pixel value. And it depends of the value of which channel
-				pos=ChangeBase(decodePosition(xx));
-				//pos=new int[]{constantPos[0],constantPos[1],0};
+				//pos=decodePosition(xx);
+				pos=new int[]{constantPos[0],constantPos[1],0};
 				//double[] newPos=normalize(pos);
 				//E=normalize(cam-pos)
 				E=normalize(XY(pos,cam));
@@ -89,7 +89,7 @@ public class Fonction implements LevenbergMarquardt.Function
 				D2=dot(E,E);
 				double[] le=addXY(L,E);
 				H=normalize(le);
-				double[] N=normalize(XY(pos,new double[]{nx,ny,1}));//on a changé N par Nx et Ny en tant que paramètre de L-M => step2_1104_soir
+				double[] N=normalize(ChangeBase(new double[]{nx,ny,2}));//on a changé N par Nx et Ny en tant que paramètre de L-M => step2_1104_soir
 				double angle=Math.acos(Math.max(0, dot(N,H)))/m;
 				double spec=1*Math.exp(-(angle*angle));
 				double cosine=Math.max(0, dot(N,E));
@@ -112,8 +112,8 @@ public class Fonction implements LevenbergMarquardt.Function
 	{
 		lightColor=light;
 		currentColor=c;
-		cam=(new int[]{0,0,1});
-		lum=(new int[]{0,0,1});//=> fichier optimize2 avec une lissage sur tous les tiles avant de optimisation et optimize3 sans lissage
+		cam=ChangeBase(new int[]{0,0,1});
+		lum=ChangeBase(new int[]{0,0,1});//=> fichier optimize2 avec une lissage sur tous les tiles avant de optimisation et optimize3 sans lissage
 	}
 	public void getPositionList(HashMap<Integer,int[]>pos)
 	{
@@ -121,55 +121,33 @@ public class Fonction implements LevenbergMarquardt.Function
 	}
 	public static int[] ChangeBase(int[] xyz)
 	{
-		DenseMatrix64F CC=new DenseMatrix64F(new double[][]{
-			{1,0,0,3264/2},
-			{0,-1,0,2304/2},
-			{0,0,1,0},
-			{0,0,0,1}
-		});
-		DenseMatrix64F PP=new DenseMatrix64F(new double[][]{
-			{xyz[0]},
-			{xyz[1]},
-			{xyz[2]},
-			{1}
-		});
-		SimpleMatrix P=new SimpleMatrix(PP);
-		SimpleMatrix C=new SimpleMatrix(CC);
-		SimpleMatrix invC=C.invert();
-		SimpleMatrix PdansO1=invC.mult(P);
-	    return new int[]{
-	    		(int)PdansO1.get(0),(int)PdansO1.get(1),(int)PdansO1.get(2)
-	    };
+	        int[] P = new int[3];
+	        int[] u = new int[] { 1, 0, 0 };
+	        int[] v = new int[] { 0, 1, 0 };
+	        int[] w = new int[] { 0, 0, 1 };
+	        P[0] = u[0] * xyz[0]+(2304/2) ;
+	        P[1] = v[1] * xyz[1] +(3264/2);
+	        P[2] = w[2]*xyz[2];
+	        return P;
 	 }
-	public static int[] ChangeBase(double[] xyz)
+	public static double[] ChangeBase(double[] xyz)
 	{
-		DenseMatrix64F CC=new DenseMatrix64F(new double[][]{
-			{1,0,0,3264/2},
-			{0,-1,0,2304/2},
-			{0,0,1,0},
-			{0,0,0,1}
-		});
-		DenseMatrix64F PP=new DenseMatrix64F(new double[][]{
-			{xyz[0]},
-			{xyz[1]},
-			{xyz[2]},
-			{1}
-		});
-		SimpleMatrix P=new SimpleMatrix(PP);
-		SimpleMatrix C=new SimpleMatrix(CC);
-		SimpleMatrix invC=C.invert();
-		SimpleMatrix PdansO1=invC.mult(P);
-	    return new int[]{
-	    		(int)PdansO1.get(0),(int)PdansO1.get(1),(int)PdansO1.get(2)
-	    };
+		double[] P = new double[3];
+		double[] u = new double[] { 1, 0, 0 };
+		double[] v = new double[] { 0, 1, 0 };
+		double[] w = new double[] { 0, 0, 1 };
+		P[0] = u[0] * xyz[0]+(2304/2) ;
+        P[1] = v[1] * xyz[1] +(3264/2);
+        P[2] = w[2]*xyz[2];
+        return P;
 	}
 	
 	public static int[] decodePosition(double pos)
 	{
 		int[] p=new int[3];
 		String[] pattern=Double.toString(pos).split("\\.");
-		p[0]=Integer.parseInt(pattern[1].substring(0, pattern[1].length()-1));
-		p[1]=Integer.parseInt(pattern[0]);
+		p[0]=Integer.parseInt(pattern[0]);
+		p[1]=Integer.parseInt(pattern[1].substring(0, pattern[1].length()-1));
 		p[2]=0;
 		return p;
 	}
@@ -179,10 +157,6 @@ public class Fonction implements LevenbergMarquardt.Function
 	public static int[] XY(int[] x,int[] y)
 	{
 		return new int[]{y[0]-x[0],y[1]-x[1],y[2]-x[2]};
-	}
-	public static double[] XY(int[] x,double[] y)
-	{
-		return new double[]{y[0]-x[0],y[1]-x[1],y[2]-x[2]};
 	}
 	public static double[] normalize(int[] x)
 	{
